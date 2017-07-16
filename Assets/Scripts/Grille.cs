@@ -38,8 +38,9 @@ public class Grille {
 					inWord = false;
 				}
 			}
+			inWord = false;
 		}
-		if (listeMotsHorizontaux.Count > 1){
+		if (listeMotsHorizontaux.Count > 1) {
 			listeMotsHorizontaux [listeMotsHorizontaux.Count - 1].Suivant = listeMotsHorizontaux [0];
 			listeMotsHorizontaux [0].Precedent = listeMotsHorizontaux [listeMotsHorizontaux.Count - 1];
 		}
@@ -64,6 +65,7 @@ public class Grille {
 					inWord = false;
 				}
 			}
+			inWord = false;
 		}
 		if (listeMotsVerticaux.Count > 1){
 			listeMotsVerticaux [listeMotsVerticaux.Count - 1].Suivant = listeMotsVerticaux [0];
@@ -87,6 +89,23 @@ public class Grille {
 					listeLettres [x, y] = new Lettre (null, x, y);
 				}
 			}
+		}
+	}
+
+	public int PlusLongMot {
+		get {
+			int taille = 0;
+			foreach (Mot mot in listeMotsHorizontaux) {
+				if (mot.Taille > taille) {
+					taille = mot.Taille;
+				}
+			}
+			foreach (Mot mot in listeMotsVerticaux) {
+				if (mot.Taille > taille) {
+					taille = mot.Taille;
+				}
+			}
+			return taille;
 		}
 	}
 }

@@ -4,24 +4,26 @@ using UnityEngine;
 
 public class LaunchManager : MonoBehaviour {
 
-	public Grille g;
+	public Grille grille;
+	public Bd bd;
 	public TextAsset gridFile;
+	public TextAsset[] fichiersDicos;
 	public GameObject WhiteSpace;
 	public GameObject BlackSpace;
 
-
 	// Use this for initialization
-	void Start () {
-		g = new Grille (gridFile);
-		for (int y = 0; y < g.nbLignes; y++) {
-			for (int x = 0; x < g.nbLignes; x++) {
-				if (g.listeLettres[x, y].valeur != null) {
-					Object.Instantiate(WhiteSpace, new Vector3((float)x, (float)-y, 0.0f), Quaternion.identity);
+	void Awake () {
+		grille = new Grille (gridFile);
+		for (int y = 0; y < grille.nbLignes; y++) {
+			for (int x = 0; x < grille.nbLignes; x++) {
+				if (grille.listeLettres[x, y].valeur != null) {
+					grille.listeLettres[x, y].Go = Object.Instantiate(WhiteSpace, new Vector3((float)x, (float)-y, 0.0f), Quaternion.identity);
 				} else {
-					Object.Instantiate(BlackSpace, new Vector3((float)x, (float)-y, 0.0f), Quaternion.identity);
+					grille.listeLettres[x, y].Go = Object.Instantiate(BlackSpace, new Vector3((float)x, (float)-y, 0.0f), Quaternion.identity);
 				}
 			}
 		}
+		bd = new Bd (fichiersDicos, grille.PlusLongMot);
 	}
 	
 	// Update is called once per frame
