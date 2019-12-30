@@ -1,14 +1,17 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Lettre {
-	public string valeur;
-	private int x;
-	private int y;
+
+	[SerializeField] public string valeur;
+	[SerializeField] private int x;
+	[SerializeField] private int y;
 	private Mot motHorizontal;
 	private Mot motVertical;
-	private GameObject go;
+	[SerializeField] private GameObject go;
+	[SerializeField] private TextMesh goText;
+	[SerializeField] private SpriteRenderer goRenderer;
+
+	#region Création
 
 	public Lettre (string valeur, int x, int y) {
 		this.valeur = valeur;
@@ -17,7 +20,101 @@ public class Lettre {
 		this.motHorizontal = null;
 		this.motVertical = null;
 		this.go = null;
+		this.goText = null;
+		this.goRenderer = null;
 	}
+
+	#endregion Création
+
+	#region Écriture
+
+	public void EnregistrerLettre(string contenu, Bd bd) {
+		valeur = contenu;
+		/*
+		if (motHorizontal != null && !motHorizontal.Rempli && !motHorizontal.Contenu.Contains(".")) {
+			motHorizontal.Rempli = true;
+			MotDico motDico = bd.RechercherMotParContenu(motHorizontal.Contenu);
+			motHorizontal.MotDico = motDico;
+			bd.MarquerMotUtilise(motDico, true);
+		}
+		if (motVertical != null && !motVertical.Rempli && !motVertical.Contenu.Contains(".")) {
+			motVertical.Rempli = true;
+			MotDico motDico = bd.RechercherMotParContenu(motVertical.Contenu);
+			motVertical.MotDico = motDico;
+			bd.MarquerMotUtilise(motDico, true);
+		}
+		*/
+	}
+
+	public void EffacerLettre() {
+		if ((motHorizontal == null || !motHorizontal.Rempli) && (motVertical == null || !motVertical.Rempli)) {
+			valeur = ".";
+		}
+	}
+
+	public void AfficherLettre() {
+		this.GoText.text = (this.valeur);
+	}
+
+	public void MarquerMotRempli(bool direction, Bd bd) {
+		Mot mot = ObtenirMotDansDirection(direction);
+		if (mot != null) {
+			if (mot.Rempli) {
+				if (mot.Contenu.Contains(".")) {
+					mot.Rempli = false;
+					bd.MarquerMotUtilise(mot.MotDico, false);
+					mot.MotDico = null;
+				}
+			} else {
+				if (!mot.Contenu.Contains(".")) {
+					mot.Rempli = true;
+					mot.MotDico = bd.RechercherMotParContenu(mot.Contenu);
+					bd.MarquerMotUtilise(mot.MotDico, true);
+				}
+			}
+		}
+	}
+
+	#endregion Écriture
+
+	#region OutilsDeRecherche
+
+	public bool ExistentMots(bool horizontal, Bd bd) {
+		if (ObtenirMotDansDirection(horizontal) == null || ObtenirMotDansDirection(horizontal).Rempli || bd.ExistentMotsPossibles(ObtenirMotDansDirection(horizontal).Contenu)) {
+			return true;
+		}
+		return false;
+	}
+
+	public Lettre Suivante(bool horizontal) {
+		int index = ObtenirMotDansDirection(horizontal).ListeLettres.IndexOf(this);
+		if (index < (ObtenirMotDansDirection(horizontal).Taille - 1)) {
+			return ObtenirMotDansDirection(horizontal).ListeLettres[index + 1];
+		} else {
+			return ObtenirMotDansDirection(horizontal).Suivant.ListeLettres[0];
+		}
+	}
+
+	public Lettre Precedente(bool horizontal) {
+		int index = ObtenirMotDansDirection(horizontal).ListeLettres.IndexOf(this);
+		if (index > 0) {
+			return ObtenirMotDansDirection(horizontal).ListeLettres[index - 1];
+		} else {
+			return ObtenirMotDansDirection(horizontal).Precedent.ListeLettres[ObtenirMotDansDirection(horizontal).Precedent.Taille - 1];
+		}
+	}
+
+	public Mot ObtenirMotDansDirection(bool horizontal) {
+		if (horizontal) {
+			return MotHorizontal;
+		} else {
+			return motVertical;
+		}
+	}
+
+	#endregion OutilsDeRecherche
+
+	#region AccesseursMutateurs
 
 	public int X {
 		get {
@@ -58,47 +155,23 @@ public class Lettre {
 		}
 	}
 
-	public Lettre SuivanteHorizontale {
+	public TextMesh GoText {
 		get {
-			int index = motHorizontal.ListeLettres.IndexOf (this);
-			if (index < (motHorizontal.Taille - 1)) {
-				return motHorizontal.ListeLettres [index + 1];
-			} else {
-				return motHorizontal.Suivant.ListeLettres [0];
-			}
+			return this.goText;
+		}
+		set {
+			this.goText = value;
 		}
 	}
 
-	public Lettre PrecedenteHorizontale {
+	public SpriteRenderer GoRenderer {
 		get {
-			int index = motHorizontal.ListeLettres.IndexOf (this);
-			if (index > 0) {
-				return motHorizontal.ListeLettres [index - 1];
-			} else {
-				return motHorizontal.Precedent.ListeLettres [motHorizontal.Precedent.Taille - 1];
-			}
+			return this.goRenderer;
+		}
+		set {
+			this.goRenderer = value;
 		}
 	}
 
-	public Lettre SuivanteVerticale {
-		get {
-			int index = motVertical.ListeLettres.IndexOf (this);
-			if (index < (motVertical.Taille - 1)) {
-				return motVertical.ListeLettres [index + 1];
-			} else {
-				return motVertical.Suivant.ListeLettres [0];
-			}
-		}
-	}
-
-	public Lettre PrecedenteVerticale {
-		get {
-			int index = motVertical.ListeLettres.IndexOf (this);
-			if (index > 0) {
-				return motVertical.ListeLettres [index - 1];
-			} else {
-				return motVertical.Precedent.ListeLettres [motVertical.Precedent.Taille - 1];
-			}
-		}
-	}
+	#endregion AccesseursMutateurs
 }
