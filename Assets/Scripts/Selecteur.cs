@@ -6,34 +6,46 @@ using UnityEngine;
 public class Selecteur : MonoBehaviour {
 
 	bool horizontalMode;
-	Grille grille;
 	Lettre lettreActuelle;
+	private LaunchManager launchManager;
+
+	private void Awake() {
+		launchManager = gameObject.GetComponent<LaunchManager>();
+	}
 
 	// Use this for initialization
 	void Start () {
-		horizontalMode = true;
-		grille = gameObject.GetComponent<LaunchManager> ().grille;
-		MajLettreActuelle(grille.listeLettres [0, 0]);
+		Initialiser();
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		if (Input.GetButtonDown("Horizontal")) {
-			horizontalMode = true;
-			if (Input.GetAxisRaw("Horizontal") > 0) {
-				MajLettreActuelle(lettreActuelle.Suivante(true));
-			} else {
-				MajLettreActuelle(lettreActuelle.Precedente(true));
+		if (launchManager.grille != null) {
+			if (Input.GetButtonDown("Horizontal")) {
+				horizontalMode = true;
+				if (Input.GetAxisRaw("Horizontal") > 0) {
+					MajLettreActuelle(lettreActuelle.Suivante(true));
+				} else {
+					MajLettreActuelle(lettreActuelle.Precedente(true));
+				}
+			}
+			if (Input.GetButtonDown("Vertical")) {
+				horizontalMode = false;
+				if (Input.GetAxisRaw("Vertical") < 0) {
+					MajLettreActuelle(lettreActuelle.Suivante(false));
+				} else {
+					MajLettreActuelle(lettreActuelle.Precedente(false));
+				}
 			}
 		}
-		if (Input.GetButtonDown("Vertical")) {
-			horizontalMode = false;
-			if (Input.GetAxisRaw("Vertical") < 0) {
-				MajLettreActuelle(lettreActuelle.Suivante(false));
-			} else {
-				MajLettreActuelle(lettreActuelle.Precedente(false));
-			}
+	}
+
+	public void Initialiser() {
+		horizontalMode = true;
+		if (launchManager == null) {
+			launchManager = gameObject.GetComponent<LaunchManager>();
 		}
+		MajLettreActuelle(launchManager.grille.listeLettres[0, 0]);
 	}
 
 	private void MajLettreActuelle(Lettre nouvelleLettre) {
@@ -47,22 +59,30 @@ public class Selecteur : MonoBehaviour {
 
 	private void surlignerMot(Lettre lettre) {
 		if (horizontalMode) {
-			foreach (Lettre l in lettre.MotHorizontal.ListeLettres) {
-				l.GoRenderer.color = Color.cyan;
+			if (lettre.MotHorizontal != null) {
+				foreach (Lettre l in lettre.MotHorizontal.ListeLettres) {
+					l.GoRenderer.color = Color.cyan;
+				}
 			}
 		} else {
-			foreach (Lettre l in lettre.MotVertical.ListeLettres) {
-				l.GoRenderer.color = Color.cyan;
+			if (lettre.MotVertical != null) {
+				foreach (Lettre l in lettre.MotVertical.ListeLettres) {
+					l.GoRenderer.color = Color.cyan;
+				}
 			}
 		}
 	}
 
 	private void blanchirMot(Lettre lettre) {
-		foreach (Lettre l in lettre.MotHorizontal.ListeLettres) {
-			l.GoRenderer.color = Color.white;
+		if (lettre.MotHorizontal != null) {
+			foreach (Lettre l in lettre.MotHorizontal.ListeLettres) {
+				l.GoRenderer.color = Color.white;
+			}
 		}
-		foreach (Lettre l in lettre.MotVertical.ListeLettres) {
-			l.GoRenderer.color = Color.white;
+		if (lettre.MotVertical != null) {
+			foreach (Lettre l in lettre.MotVertical.ListeLettres) {
+				l.GoRenderer.color = Color.white;
+			}
 		}
 	}
 }

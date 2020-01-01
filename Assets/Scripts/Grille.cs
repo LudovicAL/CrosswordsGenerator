@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
 public class Grille {
 	public int nbLignes {get; private set;}
 	public int nbColonnes {get; private set;}
@@ -12,14 +11,12 @@ public class Grille {
 	
 	#region Création
 
-	public Grille(TextAsset gridFile) {
+	public Grille(string gridAsString) {
 		listeMotsHorizontaux = new List<Mot> ();
 		listeMotsVerticaux = new List<Mot> ();
-		LireGridFile (gridFile);
+		LireGridFile (gridAsString);
 		TrouverMotsHorizontaux ();
 		TrouverMotsVerticaux ();
-		TrouverMotsVoisins (listeMotsHorizontaux);
-		TrouverMotsVoisins (listeMotsVerticaux);
 		SupprimerMotsUneLettre (listeMotsHorizontaux);
 		SupprimerMotsUneLettre (listeMotsVerticaux);
 		TrouverMotsVoisins (listeMotsHorizontaux);
@@ -29,6 +26,7 @@ public class Grille {
 		listeMots = new List<Mot> ();
 		listeMots.AddRange (listeMotsHorizontaux);
 		listeMots.AddRange (listeMotsVerticaux);
+		AjouterReferenceLettreAMots();
 		CalculerScores();
 	}
 
@@ -45,6 +43,18 @@ public class Grille {
 	#endregion Outils
 
 	#region Initialisation
+
+	private void AjouterReferenceLettreAMots() {
+		foreach (Mot mot in listeMots) {
+			foreach (Lettre lettre in mot.ListeLettres) {
+				if (mot.Horizontal) {
+					lettre.MotHorizontal = mot;
+				} else {
+					lettre.MotVertical = mot;
+				}
+			}
+		}
+	}
 
 	private void AttribuerPositionSecondaires(List<Mot> listeMots) {
 		int index = 0;
@@ -84,7 +94,6 @@ public class Grille {
 						inWord = true;
 					}
 					listeMotsHorizontaux [listeMotsHorizontaux.Count - 1].AjouterLettre (listeLettres [x, y]);
-					listeLettres [x, y].MotHorizontal = listeMotsHorizontaux [listeMotsHorizontaux.Count - 1];
 				} else {
 					inWord = false;
 				}
@@ -103,7 +112,6 @@ public class Grille {
 						inWord = true;
 					}
 					listeMotsVerticaux [listeMotsVerticaux.Count - 1].AjouterLettre (listeLettres [x, y]);
-					listeLettres [x, y].MotVertical = listeMotsVerticaux [listeMotsVerticaux.Count - 1];
 				} else {
 					inWord = false;
 				}
@@ -113,10 +121,9 @@ public class Grille {
 	}
 
 	//Extracts the black and whites spaces from the text file and creates the corresponding spaces in the grid
-	private void LireGridFile(TextAsset gridFile) {
-		string gridFilecontent = gridFile.text;
+	private void LireGridFile(string gridAsString) {
 		List<string> eachLine = new List<string>();
-		eachLine.AddRange(gridFilecontent.Split("\n"[0]) );
+		eachLine.AddRange(gridAsString.Split("\n"[0]) );
 		nbLignes = eachLine.Count - 1;
 		nbColonnes = eachLine[0].Length - 1;
 		listeLettres = new Lettre[nbLignes, nbColonnes];

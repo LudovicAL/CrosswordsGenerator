@@ -2,14 +2,14 @@
 
 public class Lettre {
 
-	[SerializeField] public string valeur;
-	[SerializeField] private int x;
-	[SerializeField] private int y;
+	public string valeur;
+	private int x;
+	private int y;
 	private Mot motHorizontal;
 	private Mot motVertical;
-	[SerializeField] private GameObject go;
-	[SerializeField] private TextMesh goText;
-	[SerializeField] private SpriteRenderer goRenderer;
+	private GameObject go;
+	private TextMesh goText;
+	private SpriteRenderer goRenderer;
 
 	#region Création
 

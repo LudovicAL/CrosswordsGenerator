@@ -16,6 +16,10 @@ public class Definisseur : MonoBehaviour {
 
 	}
 
+	public void ViderDefinitions() {
+		text.text = "";
+	}
+
 	public void AfficherDefinitions(Grille grille, Bd bd) {
 		panel.SetActive(true);
 		text.text = "";

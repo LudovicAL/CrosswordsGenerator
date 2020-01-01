@@ -181,9 +181,11 @@ GX
 GY
 GZ
 HA
+HA
 HB
 HC
 HD
+HE
 HE
 HF
 HG
@@ -194,6 +196,7 @@ HK
 HL
 HM
 HN
+HO
 HO
 HP
 HQ
@@ -285,6 +288,7 @@ KX
 KY
 KZ
 LA
+LA
 LB
 LC
 LD
@@ -304,6 +308,7 @@ LQ
 LR
 LS
 LT
+LU
 LU
 LV
 LW
@@ -331,6 +336,7 @@ MR
 MS
 MT
 MU
+MU
 MV
 MW
 MX
@@ -340,6 +346,7 @@ NA
 NB
 NC
 ND
+NE
 NE
 NF
 NG
@@ -357,6 +364,7 @@ NR
 NS
 NT
 NU
+NU
 NV
 NW
 NX
@@ -365,10 +373,12 @@ NZ
 OA
 OB
 OC
+OC
 OD
 OE
 OF
 OG
+OH
 OH
 OI
 OJ
@@ -380,8 +390,11 @@ OO
 OP
 OQ
 OR
+OR
+OS
 OS
 OT
+OU
 OU
 OV
 OW
@@ -408,6 +421,7 @@ PQ
 PR
 PS
 PT
+PU
 PU
 PV
 PW
@@ -449,6 +463,7 @@ RF
 RG
 RH
 RI
+RI
 RJ
 RK
 RL
@@ -460,6 +475,7 @@ RQ
 RR
 RS
 RT
+RU
 RU
 RV
 RW
@@ -475,6 +491,7 @@ SF
 SG
 SH
 SI
+SI
 SJ
 SK
 SL
@@ -486,6 +503,7 @@ SQ
 SR
 SS
 ST
+SU
 SU
 SV
 SW
@@ -513,6 +531,7 @@ TR
 TS
 TT
 TU
+TU
 TV
 TW
 TX
@@ -532,10 +551,12 @@ UK
 UL
 UM
 UN
+UN
 UO
 UP
 UQ
 UR
+US
 US
 UT
 UU
@@ -544,6 +565,7 @@ UW
 UX
 UY
 UZ
+VA
 VA
 VB
 VC
@@ -564,6 +586,7 @@ VQ
 VR
 VS
 VT
+VU
 VU
 VV
 VW

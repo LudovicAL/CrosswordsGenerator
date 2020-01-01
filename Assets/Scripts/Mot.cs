@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
 public class Mot {
 	private List<Lettre> listeLettres;
 	private bool rempli;
@@ -85,7 +84,7 @@ public class Mot {
 
 	public string[] ObtenirDefinitions(Bd bd) {
 		MotDico motDef = bd.RechercherMotParContenuPourDefinitions(this.Contenu);
-		if (motDef != null) {
+		if (motDef != null && motDef.definitions.Length > 0) {
 			return motDef.definitions;
 		} else {
 			Debug.Log("Le mot " + this.Contenu + " n'a pas été trouvé dans le dictionnaire de définitions.");
@@ -105,8 +104,9 @@ public class Mot {
 	public Mot ObtenirMotTransversalRempliAleatoire() {
 		List<Mot> listeMotsTransversaux = new List<Mot>();
 		foreach (Lettre lettre in listeLettres) {
-			if (lettre.ObtenirMotDansDirection(!horizontal).Rempli) {
-				listeMotsTransversaux.Add(lettre.ObtenirMotDansDirection(!horizontal));
+			Mot motTransversal = lettre.ObtenirMotDansDirection(!horizontal);
+			if (motTransversal != null && motTransversal.Rempli) {
+				listeMotsTransversaux.Add(motTransversal);
 			}
 		}
 		if (listeMotsTransversaux.Count != 0) {
@@ -120,9 +120,12 @@ public class Mot {
 		List<Mot> listeMotsAdjacents = new List<Mot>();
 		foreach (Lettre lettre in listeLettres) {
 			Mot motTransversal = lettre.ObtenirMotDansDirection(!horizontal);
-			foreach (Lettre lettreTransversale in motTransversal.listeLettres) {
-				if (lettreTransversale.ObtenirMotDansDirection(horizontal).Rempli) {
-					listeMotsAdjacents.Add(lettreTransversale.ObtenirMotDansDirection(horizontal));
+			if (motTransversal != null) {
+				foreach (Lettre lettreTransversale in motTransversal.listeLettres) {
+					Mot motAdjacent = lettreTransversale.ObtenirMotDansDirection(horizontal);
+					if (motAdjacent != null && motAdjacent.Rempli) {
+						listeMotsAdjacents.Add(motAdjacent);
+					}
 				}
 			}
 		}

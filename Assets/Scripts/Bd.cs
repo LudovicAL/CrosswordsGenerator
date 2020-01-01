@@ -60,8 +60,11 @@ public class Bd {
 		return listeDicos[pattern.Length].Where(x => Regex.IsMatch(x.contenu, pattern)).Where(e => e.utilise == false).Count<MotDico>();
 	}
 
+	public List<MotDico> ListeMotsPossiblesTriesParScore(string pattern) {
+		return listeDicos[pattern.Length].Where(x => Regex.IsMatch(x.contenu, pattern)).Where(e => e.utilise == false).OrderByDescending(o => o.score).ToList<MotDico>();
+	}
+
 	public List<MotDico> ListeMotsPossibles(string pattern) {
-		//return listeDicos [pattern.Length].Where(x => Regex.IsMatch(x.contenu, pattern)).Where(e => e.utilise == false).OrderByDescending(o => o.score).ToList<MotDico>();
 		return listeDicos[pattern.Length].Where(x => Regex.IsMatch(x.contenu, pattern)).Where(e => e.utilise == false).ToList<MotDico>();
 	}
 

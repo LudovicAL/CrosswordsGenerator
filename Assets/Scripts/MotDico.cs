@@ -1,5 +1,4 @@
-﻿[System.Serializable]
-public class MotDico {
+﻿public class MotDico {
 	public string contenu;
 	public int longueur;
 	public float score;

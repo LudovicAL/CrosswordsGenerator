@@ -2,106 +2,106 @@
 using UnityEngine;
 
 public class Remplisseur {
-
 	private List<MotDico> listeMotsPossibles;
-	int i = 0;
+	private int i = 0;
+
+	public void Initialiser() {
+		i = 0;
+	}
 
 	public void RemplirGrille(Bd bd, List<Mot> listeMots, int nbEssaisMaxGlobal, int nbEssaisMaxPourMot, bool afficher) {
-		for (int max = listeMots.Count, nbEssaisGlobal = 0; i < max && nbEssaisGlobal < nbEssaisMaxGlobal; i++, nbEssaisGlobal++) {
+		for (int max = listeMots.Count, nbEssaisGlobal = 0; i < max && nbEssaisGlobal < nbEssaisMaxGlobal; i++) {
 			if (!listeMots[i].Rempli) {
-				listeMotsPossibles = bd.ListeMotsPossibles(listeMots[i].Contenu);
-				//Debug.Log("listeMotsPossibles.Count: " + listeMotsPossibles.Count);
-				for (int j = 0, nbMotsPossibles = listeMotsPossibles.Count; j < nbEssaisMaxPourMot && j < nbMotsPossibles; j++) {
-					//Debug.Log(j);
-					int rnd = Random.Range(0, nbMotsPossibles - 1);
-					listeMots[i].EnregistrerMot(listeMotsPossibles[rnd], bd);
-					if (listeMots[i].ExistentMotsTransversaux(bd)) {
-						//Debug.Log("Ai écris " + listeMots[i].Contenu);
-						listeMots[i].MarquerCommeRempli(listeMotsPossibles[rnd], bd);
-						if (afficher) {
-							listeMots[i].AfficherMot();
-						}
-						break;
-					} else {
-						//Debug.Log("Ai tenté d'écrire " + listeMots[i].Contenu + " mais pas de mots transversaux existants");
-						listeMots[i].EffacerMot(bd);
-						listeMotsPossibles.RemoveAt(rnd);
-						nbMotsPossibles--;
-					}
-					/*
-					int nbEchange = 0;
-					while (listeMots[i].ContenusPrecedents.Contains(listeMotsPossibles[j].contenu) && nbEchange < nbMotsPossibles) {
-						//Debug.Log("Switch sur " + listeMotsPossibles[j].contenu);
-						MotDico motPossible = listeMotsPossibles[j];
-						listeMotsPossibles.RemoveAt(j);
-						listeMotsPossibles.Add(motPossible);
-						nbEchange++;
-					}
-					if (nbEchange >= nbMotsPossibles) {
-						//Debug.Log("Clear");
-						listeMots[i].ContenusPrecedents.Clear();
-					}			
-					listeMots[i].EnregistrerMot(listeMotsPossibles[j], bd);
-					if (listeMots[i].ExistentMotsTransversaux(bd)) {
-						//Debug.Log("Ai écris " + listeMots[i].Contenu);
-						listeMots[i].MarquerCommeRempli(listeMotsPossibles[j], bd);
-						if (afficher) {
-							listeMots[i].AfficherMot();
-						}
-						break;
-					} else {
-						//Debug.Log("Ai tenté d'écrire " + listeMots[i].Contenu + " mais pas de mots transversaux existants");
-						listeMots[i].EffacerMot(bd);
-					}
-					*/
-				}
+				nbEssaisGlobal++;
+				//Debug.Log("Vais remplir: " + listeMots[i].PositionPrimaire + ":" + listeMots[i].PositionSecondaire);
+				//RemplirMot(listeMots[i], bd, nbEssaisMaxPourMot, afficher);
+				RemplirMotSelonScore(listeMots[i], bd, nbEssaisMaxPourMot, afficher);
 				if (!listeMots[i].Rempli) {
-					if (listeMotsPossibles.Count == 0) {
-						//Debug.Log("Pas de mot possible pour " + (listeMots[i].Horizontal?"Horizontal":"Vertical") + " " + listeMots[i].PositionPrimaire + ":" + listeMots[i].PositionSecondaire);
-					} else {
-						//Debug.Log("Pas de mot transversal pour " + (listeMots[i].Horizontal ? "Horizontal" : "Vertical") + " " + listeMots[i].PositionPrimaire + ":" + listeMots[i].PositionSecondaire);
-					}
-
-					Mot motTransversalAleatoire = listeMots[i].ObtenirMotTransversalRempliAleatoire();
-					if (motTransversalAleatoire != null) {
-						//Debug.Log("Retrait du motTransversalAleatoire " + motTransversalAleatoire.Contenu + " en position " + (motTransversalAleatoire.Horizontal ? "Horizontal" : "Vertical") + " " + motTransversalAleatoire.PositionPrimaire + ":" + motTransversalAleatoire.PositionSecondaire);
-						motTransversalAleatoire.EffacerMot(bd);
-						if (afficher) {
-							motTransversalAleatoire.AfficherMot();
-						}
-						listeMots.Remove(motTransversalAleatoire);
-						listeMots.Insert(i, motTransversalAleatoire);
-						i = i - 2;
-					} else {
-						Mot motAdjacentAleatoire = listeMots[i].ObtenirMotAdjacentRempliAleatoire();
-						if (motAdjacentAleatoire != null) {
-							//Debug.Log("Retrait du motAdjacentAleatoire " + motAdjacentAleatoire.Contenu + " en position " + (motAdjacentAleatoire.Horizontal ? "Horizontal" : "Vertical") + " " + motAdjacentAleatoire.PositionPrimaire + ":" + motAdjacentAleatoire.PositionSecondaire);
-							motAdjacentAleatoire.EffacerMot(bd);
-							if (afficher) {
-								motAdjacentAleatoire.AfficherMot();
-							}
-							listeMots.Remove(motAdjacentAleatoire);
-							listeMots.Insert(i, motAdjacentAleatoire);
-							i = i - 2;
-						} else {
-							//Debug.Log("Retrait aléatoire... ");
-							if (i == 0) {
-								Debug.Log("Erreur critique");
-								break;
-							}
-							Mot motAleatoire = listeMots[Random.Range(0, (i - 1))];
-							//Debug.Log("Retrait du motAleatoire " + motAleatoire.Contenu + " en position " + (motAleatoire.Horizontal ? "Horizontal" : "Vertical") + " " + motAleatoire.PositionPrimaire + ":" + motAleatoire.PositionSecondaire);
-							motAleatoire.EffacerMot(bd);
-							if (afficher) {
-								motAleatoire.AfficherMot();
-							}
-							listeMots.Remove(motAleatoire);
-							listeMots.Insert(i, motAleatoire);
-							break;
-						}
-					}
+					RetirerMotAleatoire(listeMots, bd, afficher);
 				}
 			}
 		}
+	}
+
+	public void RemplirMot(Mot mot, Bd bd, int nbEssaisMaxPourMot, bool afficher) {
+		listeMotsPossibles = bd.ListeMotsPossibles(mot.Contenu);
+		for (int j = 0, nbMotsPossibles = listeMotsPossibles.Count; j < nbEssaisMaxPourMot && j < nbMotsPossibles; j++) {
+			int rnd = Random.Range(0, nbMotsPossibles - 1);
+			mot.EnregistrerMot(listeMotsPossibles[rnd], bd);
+			if (mot.ExistentMotsTransversaux(bd)) {
+				//Debug.Log("Ai écris " + mot.Contenu);
+				mot.MarquerCommeRempli(listeMotsPossibles[rnd], bd);
+				if (afficher) {
+					mot.AfficherMot();
+				}
+				break;
+			} else {
+				//Debug.Log("Ai tenté d'écrire " + mot.Contenu + " mais pas de mots transversaux existants");
+				mot.EffacerMot(bd);
+				listeMotsPossibles.RemoveAt(rnd);
+				nbMotsPossibles--;
+			}
+		}
+	}
+
+	public void RemplirMotSelonScore(Mot mot, Bd bd, int nbEssaisMaxPourMot, bool afficher) {
+		listeMotsPossibles = bd.ListeMotsPossiblesTriesParScore(mot.Contenu);
+		for (int j = 0, nbMotsPossibles = listeMotsPossibles.Count; j < nbEssaisMaxPourMot && j < nbMotsPossibles; j++) {
+			int nbEchange = 0;
+			while (mot.ContenusPrecedents.Contains(listeMotsPossibles[j].contenu) && nbEchange < nbMotsPossibles) {
+				//Debug.Log("Switch sur " + listeMotsPossibles[j].contenu);
+				MotDico motPossible = listeMotsPossibles[j];
+				listeMotsPossibles.RemoveAt(j);
+				listeMotsPossibles.Add(motPossible);
+				nbEchange++;
+			}
+			if (nbEchange >= nbMotsPossibles) {
+				//Debug.Log("Clear");
+				mot.ContenusPrecedents.Clear();
+			}
+			mot.EnregistrerMot(listeMotsPossibles[j], bd);
+			if (mot.ExistentMotsTransversaux(bd)) {
+				//Debug.Log("Ai écris " + mot.Contenu);
+				mot.MarquerCommeRempli(listeMotsPossibles[j], bd);
+				if (afficher) {
+					mot.AfficherMot();
+				}
+				break;
+			} else {
+				//Debug.Log("Ai tenté d'écrire " + mot.Contenu + " mais pas de mots transversaux existants");
+				mot.EffacerMot(bd);
+			}
+		}
+	}
+
+	public void RetirerMotAleatoire(List<Mot> listeMots, Bd bd, bool afficher) {
+		Mot motARetirer = ObtenirMotTransversalOuAdjacentAleatoire(listeMots[i]);
+		if (motARetirer == null) {
+			motARetirer = ObtenirMotAleatoire(listeMots, i);
+		}
+		//Debug.Log("Retrait du mot Aleatoire " + motARetirer.Contenu + " en position " + (motARetirer.Horizontal ? "Horizontal" : "Vertical") + " " + motARetirer.PositionPrimaire + ":" + motARetirer.PositionSecondaire);
+		motARetirer.EffacerMot(bd);
+		if (afficher) {
+			motARetirer.AfficherMot();
+		}
+		listeMots.Remove(motARetirer);
+		listeMots.Insert(i, motARetirer);
+		i = i - 2;
+	}
+
+	public Mot ObtenirMotTransversalOuAdjacentAleatoire(Mot motCourant) {
+		Mot motARetirer = motCourant.ObtenirMotTransversalRempliAleatoire();
+		if (motARetirer == null) {
+			return motCourant.ObtenirMotAdjacentRempliAleatoire();
+		}
+		return motARetirer;
+	}
+
+	public Mot ObtenirMotAleatoire(List<Mot> listeMots, int index) {
+		if (index < 2) {
+			Debug.Log("Erreur critique: aucun mot disponible pour retrait");
+			return null;
+		}
+		return listeMots[Random.Range(0, (i - 1))];
 	}
 }
