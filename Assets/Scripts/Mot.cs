@@ -9,10 +9,12 @@ public class Mot {
 	private Mot precedent;
 	private Mot suivant;
 	private int score;
+	private int scoreDeBase;
 	private List<string> contenusPrecedents = new List<string>();
 	private int positionPrimaire;
 	private int positionSecondaire;
 	private MotDico motDico;
+	public int nbTentativesDeRemplissage;
 
 	#region Création
 
@@ -25,17 +27,50 @@ public class Mot {
 		this.suivant = null;
 		this.positionPrimaire = positionPrimaire;
 		this.positionSecondaire = 0;
+		this.nbTentativesDeRemplissage = 0;
 	}
 
+	/// <summary>
+	/// Ajoute une lettre au mot courant
+	/// </summary>
+	/// <param name="l"></param>
 	public void AjouterLettre(Lettre l) {
 		listeLettres.Add(l);
 		taille = listeLettres.Count;
 	}
 
-	public void CalculerScore() {
+	/// <summary>
+	/// Calcule le score de base du mot courant
+	/// </summary>
+	public void CalculerScoreDeBase() {
+		scoreDeBase = 0;
 		foreach (Lettre lettre in listeLettres) {
 			if (lettre.ObtenirMotDansDirection(!horizontal) != null) {
-				score += 1;
+				scoreDeBase++;
+			}
+		}
+	}
+
+	/// <summary>
+	/// Calcule le score du mot courant
+	/// </summary>
+	public void CalculerScore() {
+		score = scoreDeBase;
+		foreach (Lettre lettre in listeLettres) {
+			if (lettre.valeur != ".") {
+				score += 5;
+			}
+		}
+	}
+
+	/// <summary>
+	/// Calcule les scores des mots transversaux au mot courant
+	/// </summary>
+	public void CalculerScoreDesMotsTransversaux() {
+		foreach (Lettre lettre in listeLettres) {
+			Mot motTransversal = lettre.ObtenirMotDansDirection(!this.horizontal);
+			if (motTransversal != null) {
+				motTransversal.CalculerScore();
 			}
 		}
 	}
@@ -44,37 +79,61 @@ public class Mot {
 
 	#region Écriture
 
+	/// <summary>
+	/// Enregistre une valeur dans le mot courant (mais ne le marque pas immédiatement comme rempli)
+	/// </summary>
+	/// <param name="motDico"></param>
+	/// <param name="bd"></param>
 	public void EnregistrerMot(MotDico motDico, Bd bd) {
 		for (int i = 0; i < this.taille; i++) {
-			listeLettres[i].EnregistrerLettre(motDico.contenu.Substring(i, 1).ToUpper(), bd);
+			listeLettres[i].EnregistrerLettre(motDico.contenu.Substring(i, 1).ToUpper());
 		}
 	}
 
+	/// <summary>
+	/// Efface le mot courant
+	/// </summary>
+	/// <param name="bd"></param>
 	public void EffacerMot(Bd bd) {
-		rempli = false;
-		if (this.motDico != null) {
-			bd.MarquerMotUtilise(this.motDico, false);
-			this.motDico = null;
-		}
 		contenusPrecedents.Add(Contenu);
 		foreach (Lettre lettre in listeLettres) {
-			lettre.EffacerLettre();
-			lettre.MarquerMotRempli(!horizontal, bd);
+			lettre.EffacerLettre(horizontal);
 		}
+		MarquerCommeRempli(motDico, bd, false);
 	}
 
+	/// <summary>
+	/// Effectue l'affichage du mot courant
+	/// </summary>
 	public void AfficherMot() {
 		foreach (Lettre lettre in listeLettres) {
 			lettre.AfficherLettre();
 		}
 	}
 
-	public void MarquerCommeRempli(MotDico motDico, Bd bd) {
-		rempli = true;
-		this.motDico = motDico;
-		bd.MarquerMotUtilise(motDico, true);
-		foreach (Lettre lettre in listeLettres) {
-			lettre.MarquerMotRempli(!horizontal, bd);
+	/// <summary>
+	/// Marque le mot courant comme rempli
+	/// </summary>
+	/// <param name="motDico"></param>
+	/// <param name="bd"></param>
+	public void MarquerCommeRempli(MotDico motDico, Bd bd, bool verifierTransversaux) {
+		if (rempli) {
+			if (Contenu.Contains(".")) {
+				rempli = false;
+				bd.MarquerMotUtilise(this.motDico, false);
+				this.motDico = null;
+			}
+		} else {
+			if (!Contenu.Contains(".")) {
+				rempli = true;
+				this.motDico = motDico;
+				bd.MarquerMotUtilise(motDico, true);
+			}
+		}
+		if (verifierTransversaux) {
+			foreach (Lettre lettre in listeLettres) {
+				lettre.MarquerMotRempliDansDirection(!horizontal, bd);
+			}
 		}
 	}
 
@@ -82,6 +141,11 @@ public class Mot {
 
 	#region OutilsDeReherche
 
+	/// <summary>
+	/// Retourne les définitions du mot courant
+	/// </summary>
+	/// <param name="bd"></param>
+	/// <returns></returns>
 	public string[] ObtenirDefinitions(Bd bd) {
 		MotDico motDef = bd.RechercherMotParContenuPourDefinitions(this.Contenu);
 		if (motDef != null && motDef.definitions.Length > 0) {
@@ -92,6 +156,11 @@ public class Mot {
 		}
 	}
 
+	/// <summary>
+	/// Retourne vrai si le dictionnaire contient des mots pouvant s'insérer transversalement au mot courant
+	/// </summary>
+	/// <param name="bd"></param>
+	/// <returns></returns>
 	public bool ExistentMotsTransversaux(Bd bd) {
 		foreach (Lettre lettre in listeLettres) {
 			if (!lettre.ExistentMots(!horizontal, bd)) {
@@ -101,6 +170,10 @@ public class Mot {
 		return true;
 	}
 
+	/// <summary>
+	/// Retourne au hasard l'un des mots transversux remplis
+	/// </summary>
+	/// <returns></returns>
 	public Mot ObtenirMotTransversalRempliAleatoire() {
 		List<Mot> listeMotsTransversaux = new List<Mot>();
 		foreach (Lettre lettre in listeLettres) {
@@ -116,6 +189,10 @@ public class Mot {
 		}
 	}
 
+	/// <summary>
+	/// Retourne au hasard l'un des mots adjacents remplis
+	/// </summary>
+	/// <returns></returns>
 	public Mot ObtenirMotAdjacentRempliAleatoire() {
 		List<Mot> listeMotsAdjacents = new List<Mot>();
 		foreach (Lettre lettre in listeLettres) {
@@ -218,7 +295,7 @@ public class Mot {
 
 	public MotDico MotDico {
 		get {
-			return this.motDico;
+			return motDico;
 		}
 		set {
 			this.motDico = value;

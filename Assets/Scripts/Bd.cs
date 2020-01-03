@@ -21,10 +21,20 @@ public class Bd {
 
 	#region Écriture
 
+	/// <summary>
+	/// Marque un mot comme utilisé
+	/// </summary>
+	/// <param name="contenu"></param>
+	/// <param name="utilise"></param>
 	public void MarquerMotUtilise(string contenu, bool utilise) {
 		listeDicos[contenu.Length].Find(o => o.contenu == contenu).utilise = utilise;
 	}
 
+	/// <summary>
+	/// Marque un mot comme utilisé
+	/// </summary>
+	/// <param name="motDico"></param>
+	/// <param name="utilise"></param>
 	public void MarquerMotUtilise(MotDico motDico, bool utilise) {
 		listeDicos[motDico.longueur].Find(o => o == motDico).utilise = utilise;
 	}
@@ -33,20 +43,38 @@ public class Bd {
 
 	#region OutilsDeRecherche
 
+	/// <summary>
+	/// Retourne un mot dont le contenu correspond à celui passé en paramètre
+	/// </summary>
+	/// <param name="contenu"></param>
+	/// <returns></returns>
 	public MotDico RechercherMotParContenu(string contenu) {
 		return listeDicos[contenu.Length].Find(x => x.contenu == contenu);
 	}
 
+	/// <summary>
+	/// Retourne un mot du dictionnaire mots0.txt dont le contenu correspond à celui passé en paramètre
+	/// </summary>
+	/// <param name="contenu"></param>
+	/// <returns></returns>
 	public MotDico RechercherMotParContenuPourDefinitions(string contenu) {
 		return listeDicos[0].Find(x => x.contenu == contenu);
 	}
 
+	/// <summary>
+	/// Retourne tous les dictionnaires
+	/// </summary>
 	public List<List<MotDico>> ListeDicos {
 		get {
 			return this.listeDicos;
 		}
 	}
 
+	/// <summary>
+	/// Retourne true si le dictionnaire contient au moins un mot correspondant au pattern fourni
+	/// </summary>
+	/// <param name="pattern"></param>
+	/// <returns></returns>
 	public bool ExistentMotsPossibles(string pattern) {
 		foreach (MotDico motScore in listeDicos[pattern.Length]) {
 			if (!motScore.utilise && Regex.IsMatch(motScore.contenu, pattern)) {
@@ -56,14 +84,29 @@ public class Bd {
 		return false;
 	}
 
+	/// <summary>
+	/// Retourne le nombre de mots du dictionnaire correspondant au pattern fourni
+	/// </summary>
+	/// <param name="pattern"></param>
+	/// <returns></returns>
 	public int NbMotsPossibles(string pattern) {
 		return listeDicos[pattern.Length].Where(x => Regex.IsMatch(x.contenu, pattern)).Where(e => e.utilise == false).Count<MotDico>();
 	}
 
+	/// <summary>
+	/// Retourne la liste des mots du dictionnaire correspondant au pattern fourni et triés par scores descendants
+	/// </summary>
+	/// <param name="pattern"></param>
+	/// <returns></returns>
 	public List<MotDico> ListeMotsPossiblesTriesParScore(string pattern) {
 		return listeDicos[pattern.Length].Where(x => Regex.IsMatch(x.contenu, pattern)).Where(e => e.utilise == false).OrderByDescending(o => o.score).ToList<MotDico>();
 	}
 
+	/// <summary>
+	/// Retourne la liste des mots du dictionnaire correspondant au pattern fourni
+	/// </summary>
+	/// <param name="pattern"></param>
+	/// <returns></returns>
 	public List<MotDico> ListeMotsPossibles(string pattern) {
 		return listeDicos[pattern.Length].Where(x => Regex.IsMatch(x.contenu, pattern)).Where(e => e.utilise == false).ToList<MotDico>();
 	}
@@ -72,6 +115,10 @@ public class Bd {
 
 	#region Initialisation
 
+	/// <summary>
+	/// Ajoute un dictionnaire à laliste des dictionnaires
+	/// </summary>
+	/// <param name="textAsset"></param>
 	private void AjouterDico(TextAsset textAsset) {
 		List<string> strList = textAsset.text.Split(new string[] { "\r\n", "\n" }, System.StringSplitOptions.RemoveEmptyEntries).ToList();
 		List<MotDico> lmd = new List<MotDico>();
@@ -91,7 +138,11 @@ public class Bd {
 		listeDicos.Add(lmd);
 	}
 
-	//Calcule les scores des mots  de tous les dictionnaires
+	/// <summary>
+	/// Calcule les scores des mots  de tous les dictionnaires
+	/// </summary>
+	/// <param name="fichiersDicos"></param>
+	/// <param name="plusLongMot"></param>
 	private void CalculerScoresMotsDesDicos(TextAsset[] fichiersDicos, int plusLongMot) {
 		Dictionary<string, int> decompteLettres = CompterLettresDansDicos(fichiersDicos, plusLongMot);
 		int nbLettresDansDico = CalculerNbLettresTotalDansDico(decompteLettres);
@@ -101,7 +152,12 @@ public class Bd {
 		}
 	}
 
-	//Calcule le nombre total de lettres dans tous les dictionnaires
+	/// <summary>
+	/// Calcule et retourne le nombre total de lettres dans tous les dictionnaires
+	/// </summary>
+	/// <param name="textAssets"></param>
+	/// <param name="plusLongMot"></param>
+	/// <returns></returns>
 	private Dictionary<string, int> CompterLettresDansDicos(TextAsset[] textAssets, int plusLongMot) {
 		Dictionary<string, int> decompteLettres = new Dictionary<string, int>();
 		for (int i = 2; i <= plusLongMot; i++) {
@@ -117,7 +173,11 @@ public class Bd {
 		return decompteLettres;
 	}
 
-	//Calcule le nombre de lettres dans un dictionnaire
+	/// <summary>
+	/// Calcule le nombre de lettres dans un dictionnaire
+	/// </summary>
+	/// <param name="textAsset"></param>
+	/// <returns></returns>
 	private Dictionary<string, int> CompterLettresDansDico(TextAsset textAsset) {
 		Dictionary<string, int> decompteDico = new Dictionary<string, int>();
 		for (char c = 'A'; c <= 'Z'; c++) {
@@ -126,12 +186,21 @@ public class Bd {
 		return decompteDico;
 	}
 
- 	//Calcule le nombre d'occurences d'une lettre dans un dictionnaire
+	/// <summary>
+	/// Calcule le nombre d'occurences d'une lettre dans un dictionnaire
+	/// </summary>
+	/// <param name="lettre"></param>
+	/// <param name="textAsset"></param>
+	/// <returns></returns>
 	private int CompterLettreDansDico(char lettre, TextAsset textAsset) {
 		return textAsset.text.Count(x => x == lettre);
 	}
 
-	//Calcule le total des nombres de lettre de tous les dictionnaires
+	/// <summary>
+	/// Calcule le total des nombres de lettre de tous les dictionnaires
+	/// </summary>
+	/// <param name="decompteLettres"></param>
+	/// <returns></returns>
 	private int CalculerNbLettresTotalDansDico(Dictionary<string, int> decompteLettres) {
 		int nbLettresDansDico = 0;
 		foreach (KeyValuePair<string, int> entry in decompteLettres) {
@@ -140,7 +209,12 @@ public class Bd {
 		return nbLettresDansDico;
 	}
 
-	//Calcule les scores de toutes les lettres de l'alphabet
+	/// <summary>
+	/// Calcule les scores de toutes les lettres de l'alphabet
+	/// </summary>
+	/// <param name="decompteLettres"></param>
+	/// <param name="nbLettresDansDico"></param>
+	/// <returns></returns>
 	private Dictionary<string, float> CalculerScoresDesLettres(Dictionary<string, int> decompteLettres, int nbLettresDansDico) {
 		Dictionary<string, float> scoresLettres = new Dictionary<string, float>();
 		foreach (KeyValuePair<string, int> entry in decompteLettres) {
@@ -149,7 +223,11 @@ public class Bd {
 		return scoresLettres;
 	}
 
-	//Calcule les scores de tous les mots d'un dictionnaire
+	/// <summary>
+	/// Calcule les scores de tous les mots d'un dictionnaire
+	/// </summary>
+	/// <param name="dico"></param>
+	/// <param name="scoresLettres"></param>
 	private void CalculerScoresMotsDUnDico(List<MotDico> dico, Dictionary<string, float> scoresLettres) {
 		foreach (MotDico motScore in dico) {
 			for (int j = 0, max2 = motScore.contenu.Length; j < max2; j++) {

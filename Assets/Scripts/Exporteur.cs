@@ -6,6 +6,11 @@ using System.Text;
 using UnityEngine;
 
 public class Exporteur {
+	/// <summary>
+	/// Sauvegarde la grille dans un fichier
+	/// </summary>
+	/// <param name="grille"></param>
+	/// <param name="nom"></param>
 	public void SauvegarderGrille(Grille grille, string nom) {
 		string destination = Application.persistentDataPath + "/Grilles/" + nom + ".dat";
 		FileStream file;
@@ -21,6 +26,11 @@ public class Exporteur {
 		Debug.Log("Grille sauvegardée sous " + destination);
 	}
 
+	/// <summary>
+	/// Charge une grille depuis un fichier
+	/// </summary>
+	/// <param name="nom"></param>
+	/// <returns></returns>
 	public GrilleSerializable ChargerGrille(string nom) {
 		string destination = Application.persistentDataPath + "/Grilles/" + nom + ".dat";
 		FileStream file;
@@ -54,6 +64,10 @@ public class GrilleSerializable {
 		}
 	}
 
+	/// <summary>
+	/// Retourne la grille sous forme de string
+	/// </summary>
+	/// <returns></returns>
 	public string ObtenirGridAsString() {
 		StringBuilder gridAsStringBuilder = new StringBuilder();
 		for (int y = 0; y < nbLignes; y++) {
@@ -69,14 +83,20 @@ public class GrilleSerializable {
 		return gridAsStringBuilder.ToString();
 	}
 
+	/// <summary>
+	/// Rempli la grille fournie avec les données de l'objet GrilleSerializable
+	/// </summary>
+	/// <param name="grille"></param>
+	/// <param name="bd"></param>
 	public void RemplirGrille(Grille grille, Bd bd) {
 		foreach (Lettre lettre in grille.listeLettres) {
 			if (listeLettres[lettre.X, lettre.Y] != null) {
-				lettre.EnregistrerLettre(listeLettres[lettre.X, lettre.Y], bd);
-				lettre.MarquerMotRempli(false, bd);
-				lettre.MarquerMotRempli(true, bd);
+				lettre.EnregistrerLettre(listeLettres[lettre.X, lettre.Y]);
 				lettre.AfficherLettre();
 			}
+		}
+		foreach (Mot mot in grille.listeMots) {
+			mot.MarquerCommeRempli(bd.RechercherMotParContenu(mot.Contenu), bd, true);
 		}
 	}
 }

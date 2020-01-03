@@ -28,50 +28,40 @@ public class Lettre {
 
 	#region Écriture
 
-	public void EnregistrerLettre(string contenu, Bd bd) {
+	/// <summary>
+	/// Enregistre une valeur dans la lettre courante (mais ne la marque pas immédiatement comme remplie)
+	/// </summary>
+	/// <param name="contenu"></param>
+	public void EnregistrerLettre(string contenu) {
 		valeur = contenu;
-		/*
-		if (motHorizontal != null && !motHorizontal.Rempli && !motHorizontal.Contenu.Contains(".")) {
-			motHorizontal.Rempli = true;
-			MotDico motDico = bd.RechercherMotParContenu(motHorizontal.Contenu);
-			motHorizontal.MotDico = motDico;
-			bd.MarquerMotUtilise(motDico, true);
-		}
-		if (motVertical != null && !motVertical.Rempli && !motVertical.Contenu.Contains(".")) {
-			motVertical.Rempli = true;
-			MotDico motDico = bd.RechercherMotParContenu(motVertical.Contenu);
-			motVertical.MotDico = motDico;
-			bd.MarquerMotUtilise(motDico, true);
-		}
-		*/
 	}
 
-	public void EffacerLettre() {
-		if ((motHorizontal == null || !motHorizontal.Rempli) && (motVertical == null || !motVertical.Rempli)) {
+	/// <summary>
+	/// Efface la valeur de la lettre courante
+	/// </summary>
+	public void EffacerLettre(bool direction) {
+		Mot motDansAutreDirection = ObtenirMotDansDirection(!direction);
+		if (motDansAutreDirection == null || !motDansAutreDirection.Rempli) {
 			valeur = ".";
 		}
 	}
 
+	/// <summary>
+	/// Effectue l'affichage de la lettre courante
+	/// </summary>
 	public void AfficherLettre() {
 		this.GoText.text = (this.valeur);
 	}
 
-	public void MarquerMotRempli(bool direction, Bd bd) {
-		Mot mot = ObtenirMotDansDirection(direction);
-		if (mot != null) {
-			if (mot.Rempli) {
-				if (mot.Contenu.Contains(".")) {
-					mot.Rempli = false;
-					bd.MarquerMotUtilise(mot.MotDico, false);
-					mot.MotDico = null;
-				}
-			} else {
-				if (!mot.Contenu.Contains(".")) {
-					mot.Rempli = true;
-					mot.MotDico = bd.RechercherMotParContenu(mot.Contenu);
-					bd.MarquerMotUtilise(mot.MotDico, true);
-				}
-			}
+	/// <summary>
+	/// Marque le mots utilisant la lettre courante dans la direction spécifiée comme rempli
+	/// </summary>
+	/// <param name="direction"></param>
+	/// <param name="bd"></param>
+	public void MarquerMotRempliDansDirection(bool direction, Bd bd) {
+		Mot motAMarquer = ObtenirMotDansDirection(direction);
+		if (motAMarquer != null) {
+			motAMarquer.MarquerCommeRempli(bd.RechercherMotParContenu(motAMarquer.Contenu), bd, false);
 		}
 	}
 
@@ -79,6 +69,12 @@ public class Lettre {
 
 	#region OutilsDeRecherche
 
+	/// <summary>
+	/// Retourne vrai si le dictionnaire contient au moins un mot pouvant s'inscrire dans les mots qui contiennent la lettre courante
+	/// </summary>
+	/// <param name="horizontal"></param>
+	/// <param name="bd"></param>
+	/// <returns></returns>
 	public bool ExistentMots(bool horizontal, Bd bd) {
 		if (ObtenirMotDansDirection(horizontal) == null || ObtenirMotDansDirection(horizontal).Rempli || bd.ExistentMotsPossibles(ObtenirMotDansDirection(horizontal).Contenu)) {
 			return true;
@@ -86,24 +82,39 @@ public class Lettre {
 		return false;
 	}
 
-	public Lettre Suivante(bool horizontal) {
-		int index = ObtenirMotDansDirection(horizontal).ListeLettres.IndexOf(this);
-		if (index < (ObtenirMotDansDirection(horizontal).Taille - 1)) {
-			return ObtenirMotDansDirection(horizontal).ListeLettres[index + 1];
+	/// <summary>
+	/// Retourne la lettre suivante
+	/// </summary>
+	/// <param name="horizontal"></param>
+	/// <returns></returns>
+	public Lettre Suivante(bool direction) {
+		int index = ObtenirMotDansDirection(direction).ListeLettres.IndexOf(this);
+		if (index < (ObtenirMotDansDirection(direction).Taille - 1)) {
+			return ObtenirMotDansDirection(direction).ListeLettres[index + 1];
 		} else {
-			return ObtenirMotDansDirection(horizontal).Suivant.ListeLettres[0];
+			return ObtenirMotDansDirection(direction).Suivant.ListeLettres[0];
 		}
 	}
 
-	public Lettre Precedente(bool horizontal) {
-		int index = ObtenirMotDansDirection(horizontal).ListeLettres.IndexOf(this);
+	/// <summary>
+	/// Retourne la lettre précédente
+	/// </summary>
+	/// <param name="direction"></param>
+	/// <returns></returns>
+	public Lettre Precedente(bool direction) {
+		int index = ObtenirMotDansDirection(direction).ListeLettres.IndexOf(this);
 		if (index > 0) {
-			return ObtenirMotDansDirection(horizontal).ListeLettres[index - 1];
+			return ObtenirMotDansDirection(direction).ListeLettres[index - 1];
 		} else {
-			return ObtenirMotDansDirection(horizontal).Precedent.ListeLettres[ObtenirMotDansDirection(horizontal).Precedent.Taille - 1];
+			return ObtenirMotDansDirection(direction).Precedent.ListeLettres[ObtenirMotDansDirection(direction).Precedent.Taille - 1];
 		}
 	}
 
+	/// <summary>
+	/// Retourne le mot d'une direction spécifiée qui contient la lettre courante
+	/// </summary>
+	/// <param name="direction"></param>
+	/// <returns></returns>
 	public Mot ObtenirMotDansDirection(bool horizontal) {
 		if (horizontal) {
 			return MotHorizontal;

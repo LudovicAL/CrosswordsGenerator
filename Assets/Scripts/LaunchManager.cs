@@ -27,7 +27,7 @@ public class LaunchManager : MonoBehaviour {
 
 	void Update () {
 		if (Input.GetKeyDown("space")) {
-			remplisseur.RemplirGrille (bd, grille.listeMots, nbEssaisMaxGlobal, nbEssaisMaxPourMot, false);
+			remplisseur.RemplirGrille (bd, grille, nbEssaisMaxGlobal, nbEssaisMaxPourMot, false);
 			grille.AfficherMots();
 		}
 		if (Input.GetKeyDown("a")) {
@@ -94,6 +94,5 @@ public class LaunchManager : MonoBehaviour {
 		}
 		bd = new Bd(fichiersDicos, grille.PlusLongMot);
 		selecteur.Initialiser();
-		remplisseur.Initialiser();
 	}
 }

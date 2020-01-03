@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class Grille {
 	public int nbLignes {get; private set;}
@@ -8,6 +9,7 @@ public class Grille {
 	public List<Mot> listeMotsHorizontaux;
 	public List<Mot> listeMotsVerticaux;
 	public List<Mot> listeMots;
+	public List<Mot> listeMotsARemplir;
 	
 	#region Création
 
@@ -27,13 +29,19 @@ public class Grille {
 		listeMots.AddRange (listeMotsHorizontaux);
 		listeMots.AddRange (listeMotsVerticaux);
 		AjouterReferenceLettreAMots();
+		CalculerScoresDeBase();
 		CalculerScores();
+		listeMotsARemplir = ClonerListeMots(listeMots);
+		TrierListeMotsARemplirParScore();
 	}
 
 	#endregion Création
 
 	#region Outils
 
+	/// <summary>
+	/// Effectue l'affichage de tous les mots de la grille
+	/// </summary>
 	public void AfficherMots() {
 		foreach (Mot mot in listeMots) {
 			mot.AfficherMot();
@@ -44,6 +52,18 @@ public class Grille {
 
 	#region Initialisation
 
+	//Retourne un clone (partiel) d'une liste de mot
+	private List<Mot> ClonerListeMots(List<Mot> l) {
+		List<Mot> clone = new List<Mot>();
+		foreach (Mot mot in l) {
+			clone.Add(mot);
+		}
+		return clone;
+	}
+
+	/// <summary>
+	/// Pour chaque lettres de chaque mot, ajoute une référence dans l'objet lettre pointant vers l'objet mot
+	/// </summary>
 	private void AjouterReferenceLettreAMots() {
 		foreach (Mot mot in listeMots) {
 			foreach (Lettre lettre in mot.ListeLettres) {
@@ -56,6 +76,10 @@ public class Grille {
 		}
 	}
 
+	/// <summary>
+	/// Attribue à chaque mot sa position secondaire
+	/// </summary>
+	/// <param name="listeMots"></param>
 	private void AttribuerPositionSecondaires(List<Mot> listeMots) {
 		int index = 0;
 		int i = 1;
@@ -69,6 +93,10 @@ public class Grille {
 		}
 	}
 
+	/// <summary>
+	/// Trouve les références vers les mots suivants et précédents de chaque mot
+	/// </summary>
+	/// <param name="listeMots"></param>
 	private void TrouverMotsVoisins(List<Mot> listeMots) {
 		for (int i = 0, max = listeMots.Count; i < max; i++) {
 			listeMots [i].Precedent = ((i - 1) >= 0) ? listeMots[i - 1] : listeMots[max - 1];
@@ -76,6 +104,10 @@ public class Grille {
 		}
 	}
 
+	/// <summary>
+	/// Supprime tous les mots d'une seule lettre
+	/// </summary>
+	/// <param name="listeMots"></param>
 	private void SupprimerMotsUneLettre(List<Mot> listeMots) {
 		for (int i = listeMots.Count - 1; i >= 0; i--) {
 			if (listeMots[i].Taille < 2) {
@@ -84,6 +116,9 @@ public class Grille {
 		}
 	}
 
+	/// <summary>
+	/// Trouve tous les mots horizontaux de la grille
+	/// </summary>
 	private void TrouverMotsHorizontaux() {
 		bool inWord = false;
 		for (int y = 0; y < nbLignes; y++) {    //For every line
@@ -102,6 +137,9 @@ public class Grille {
 		}
 	}
 
+	/// <summary>
+	/// Trouve tous les mots verticaux de la grille
+	/// </summary>
 	private void TrouverMotsVerticaux() {
 		bool inWord = false;
 		for (int x = 0; x < nbColonnes; x++) {
@@ -120,7 +158,10 @@ public class Grille {
 		}
 	}
 
-	//Extracts the black and whites spaces from the text file and creates the corresponding spaces in the grid
+	/// <summary>
+	/// Lit le plan des cases et crée une grille
+	/// </summary>
+	/// <param name="gridAsString"></param>
 	private void LireGridFile(string gridAsString) {
 		List<string> eachLine = new List<string>();
 		eachLine.AddRange(gridAsString.Split("\n"[0]) );
@@ -138,6 +179,9 @@ public class Grille {
 		}
 	}
 
+	/// <summary>
+	/// Retourne la taille du plus long mot
+	/// </summary>
 	public int PlusLongMot {
 		get {
 			int taille = 0;
@@ -150,14 +194,35 @@ public class Grille {
 		}
 	}
 
+	/// <summary>
+	/// Calcule les scores de tous les mots de la grille
+	/// </summary>
+	public void CalculerScoresDeBase() {
+		foreach (Mot mot in listeMots) {
+			mot.CalculerScoreDeBase();
+		}
+	}
+
+	/// <summary>
+	/// Calcule les scores de tous les mots de la grille
+	/// </summary>
 	public void CalculerScores() {
 		foreach (Mot mot in listeMots) {
 			mot.CalculerScore();
 		}
-		listeMots.Sort((x, y) => x.Score.CompareTo(y.Score));
-		listeMots.Reverse();
 	}
 
+	/// <summary>
+	/// Retourne la liste de mot passée en paramètre triée par scores
+	/// </summary>
+	public void TrierListeMotsARemplirParScore() {
+		listeMotsARemplir = listeMotsARemplir.OrderByDescending(o => o.Score).ToList();
+	}
+
+	/// <summary>
+	/// Efface tous les mots de la grille
+	/// </summary>
+	/// <param name="bd"></param>
 	public void EffacerTout(Bd bd) {
 		foreach (Mot mot in listeMots) {
 			if (mot.Rempli) {

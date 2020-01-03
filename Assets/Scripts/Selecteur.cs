@@ -13,12 +13,10 @@ public class Selecteur : MonoBehaviour {
 		launchManager = gameObject.GetComponent<LaunchManager>();
 	}
 
-	// Use this for initialization
 	void Start () {
 		Initialiser();
 	}
 	
-	// Update is called once per frame
 	void Update () {
 		if (launchManager.grille != null) {
 			if (Input.GetButtonDown("Horizontal")) {
