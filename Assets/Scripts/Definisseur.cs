@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,6 +8,17 @@ public class Definisseur : MonoBehaviour {
 
 	public GameObject panel;
 	public Text text;
+
+	public static Definisseur Instance { get; private set; }
+
+	private void Awake() {
+		if (Instance == null) {
+			Instance = this;
+		} else if (Instance != this) {
+			Destroy(gameObject);
+		}
+		//DontDestroyOnLoad(gameObject);
+	}
 
 	void Start() {
 
@@ -29,6 +41,7 @@ public class Definisseur : MonoBehaviour {
 	/// <param name="grille"></param>
 	/// <param name="bd"></param>
 	public void AfficherDefinitions(Grille grille, Bd bd) {
+		string cheminRapport = Application.persistentDataPath + "/rapport.txt";
 		panel.SetActive(true);
 		text.text = "";
 		int positionPrimairePrecedente = int.MinValue;
@@ -49,6 +62,11 @@ public class Definisseur : MonoBehaviour {
 			if (mot.Rempli) {
 				string[] definitions = mot.ObtenirDefinitions(bd);
 				definition = definitions[Random.Range(0, definitions.Length)];
+				if (definition == "Définition indéterminée") {
+					using (StreamWriter sw = File.AppendText(cheminRapport)) {
+						sw.WriteLine(mot.Contenu);
+					}
+				}
 			}
 			text.text += definition;
 			positionPrimairePrecedente = mot.PositionPrimaire;
@@ -72,6 +90,11 @@ public class Definisseur : MonoBehaviour {
 			if (mot.Rempli) {
 				string[] definitions = mot.ObtenirDefinitions(bd);
 				definition = definitions[Random.Range(0, definitions.Length)];
+				if (definition == "Définition indéterminée") {
+					using (StreamWriter sw = File.AppendText(cheminRapport)) {
+						sw.WriteLine(mot.Contenu);
+					}
+				}
 			}
 			text.text += definition;
 			positionPrimairePrecedente = mot.PositionPrimaire;

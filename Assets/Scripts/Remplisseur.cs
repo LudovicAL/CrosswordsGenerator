@@ -20,16 +20,16 @@ public class Remplisseur {
 		Mot motARemplir = ObtenirProchainMotARemplir(grille, true);
 		while (motARemplir != null && nbEssaisGlobal < nbEssaisMaxGlobal) {
 			//Debug.Log((motARemplir.Horizontal ? "Horizontal " : "Vertical ") + motARemplir.PositionPrimaire + ":" + motARemplir.PositionSecondaire);
-			if (motARemplir.nbTentativesDeRemplissage == 20) {
+			if (motARemplir.nbTentativesDeRemplissage == 10) {
+				RetirerMotAleatoire(grille, motARemplir, bd, afficher);
+				RetirerMotAleatoire(grille, motARemplir, bd, afficher);
+			} else if (motARemplir.nbTentativesDeRemplissage == 20) {
 				RetirerMotAleatoire(grille, motARemplir, bd, afficher);
 				RetirerMotAleatoire(grille, motARemplir, bd, afficher);
 			} else if (motARemplir.nbTentativesDeRemplissage == 30) {
 				RetirerMotAleatoire(grille, motARemplir, bd, afficher);
 				RetirerMotAleatoire(grille, motARemplir, bd, afficher);
 			} else if (motARemplir.nbTentativesDeRemplissage == 40) {
-				RetirerMotAleatoire(grille, motARemplir, bd, afficher);
-				RetirerMotAleatoire(grille, motARemplir, bd, afficher);
-			} else if (motARemplir.nbTentativesDeRemplissage == 50) {
 				RetirerMotsTransversaux(grille, motARemplir, bd, afficher);
 				motARemplir.nbTentativesDeRemplissage = 0;
 			}

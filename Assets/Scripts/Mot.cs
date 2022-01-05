@@ -112,6 +112,15 @@ public class Mot {
 	}
 
 	/// <summary>
+	/// Cache le mot courant
+	/// </summary>
+	public void CacherMot() {
+		foreach (Lettre lettre in listeLettres) {
+			lettre.CacherLettre();
+		}
+	}
+
+	/// <summary>
 	/// Marque le mot courant comme rempli
 	/// </summary>
 	/// <param name="motDico"></param>
@@ -151,7 +160,7 @@ public class Mot {
 		if (motDef != null && motDef.definitions.Length > 0) {
 			return motDef.definitions;
 		} else {
-			Debug.Log("Le mot " + this.Contenu + " n'a pas été trouvé dans le dictionnaire de définitions.");
+			//Debug.Log("Le mot " + this.Contenu + " n'a pas été trouvé dans le dictionnaire de définitions.");
 			return new string[] { "Définition indéterminée" };
 		}
 	}

@@ -54,6 +54,13 @@ public class Lettre {
 	}
 
 	/// <summary>
+	/// Cache la lettre courante
+	/// </summary>
+	public void CacherLettre() {
+		this.GoText.text = ".";
+	}
+
+	/// <summary>
 	/// Marque le mots utilisant la lettre courante dans la direction spécifiée comme rempli
 	/// </summary>
 	/// <param name="direction"></param>

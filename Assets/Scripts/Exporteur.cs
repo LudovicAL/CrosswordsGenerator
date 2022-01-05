@@ -11,19 +11,27 @@ public class Exporteur {
 	/// </summary>
 	/// <param name="grille"></param>
 	/// <param name="nom"></param>
-	public void SauvegarderGrille(Grille grille, string nom) {
-		string destination = Application.persistentDataPath + "/Grilles/" + nom + ".dat";
-		FileStream file;
-
-		if (File.Exists(destination)) {
-			file = File.OpenWrite(destination);
+	public void SauvegarderGrille(Grille grille, bool avecSolution) {
+		string destination = "";
+		if (avecSolution) {
+			destination = Application.persistentDataPath + "/GrillesPleines/";
 		} else {
-			file = File.Create(destination);
+			destination = Application.persistentDataPath + "/GrillesVides/";
+		}
+
+		int idNumber = Directory.GetFiles(destination, "*", SearchOption.TopDirectoryOnly).Length + 1;
+		string nomFichier = "Grille" + idNumber + ".dat";
+		FileStream file;
+		if (File.Exists(destination)) {
+			Debug.Log("ERREUR: Une grille portant le ID généré existe déjà.");
+			return;
+		} else {
+			file = File.Create(destination + nomFichier);
 		}
 		BinaryFormatter bf = new BinaryFormatter();
-		bf.Serialize(file, new GrilleSerializable(grille));
+		bf.Serialize(file, new GrilleSerializable(grille, avecSolution));
 		file.Close();
-		Debug.Log("Grille sauvegardée sous " + destination);
+		Debug.Log("Grille sauvegardée sous " + nomFichier);
 	}
 
 	/// <summary>
@@ -31,8 +39,13 @@ public class Exporteur {
 	/// </summary>
 	/// <param name="nom"></param>
 	/// <returns></returns>
-	public GrilleSerializable ChargerGrille(string nom) {
-		string destination = Application.persistentDataPath + "/Grilles/" + nom + ".dat";
+	public GrilleSerializable ChargerGrille(bool avecSolution, int idFichier) {
+		string destination = "";
+		if (avecSolution) {
+			destination = Application.persistentDataPath + "/GrillesPleines/Grille" + idFichier + ".dat";
+		} else {
+			destination = Application.persistentDataPath + "/GrillesVides/Grille" + idFichier + ".dat";
+		}
 		FileStream file;
 		if (File.Exists(destination)) {
 			file = File.OpenRead(destination);
@@ -53,13 +66,19 @@ public class GrilleSerializable {
 	public int nbColonnes;
 	public string[,] listeLettres;
 
-	public GrilleSerializable(Grille grille) {
+	public GrilleSerializable(Grille grille, bool avecSolution) {
 		this.nbLignes = grille.nbLignes;
 		this.nbColonnes = grille.nbColonnes;
 		listeLettres = new string[grille.nbLignes, grille.nbColonnes];
 		for (int y = 0; y < grille.nbLignes; y++) {
 			for (int x = 0; x < grille.nbColonnes; x++) {
-				listeLettres[x, y] = grille.listeLettres[x, y].valeur;
+				if (avecSolution) {
+					listeLettres[x, y] = grille.listeLettres[x, y].valeur;
+				} else {
+					if (grille.listeLettres[x, y].valeur != null) {
+						listeLettres[x, y] = ".";
+					}
+				}
 			}
 		}
 	}
@@ -78,7 +97,9 @@ public class GrilleSerializable {
 					gridAsStringBuilder.Append("1");
 				}
 			}
-			gridAsStringBuilder.AppendLine();
+			if (y < (nbLignes - 1)) {
+				gridAsStringBuilder.AppendLine();
+			}
 		}
 		return gridAsStringBuilder.ToString();
 	}

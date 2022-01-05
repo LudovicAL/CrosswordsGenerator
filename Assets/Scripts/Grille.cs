@@ -5,6 +5,7 @@ using System.Linq;
 public class Grille {
 	public int nbLignes {get; private set;}
 	public int nbColonnes {get; private set;}
+	public int nbCasesNoires {get; private set;}
 	public Lettre[,] listeLettres;
 	public List<Mot> listeMotsHorizontaux;
 	public List<Mot> listeMotsVerticaux;
@@ -16,7 +17,7 @@ public class Grille {
 	public Grille(string gridAsString) {
 		listeMotsHorizontaux = new List<Mot> ();
 		listeMotsVerticaux = new List<Mot> ();
-		LireGridFile (gridAsString);
+		LireGridFile(gridAsString);
 		TrouverMotsHorizontaux ();
 		TrouverMotsVerticaux ();
 		SupprimerMotsUneLettre (listeMotsHorizontaux);
@@ -33,6 +34,7 @@ public class Grille {
 		CalculerScores();
 		listeMotsARemplir = ClonerListeMots(listeMots);
 		TrierListeMotsARemplirParScore();
+		CompterCasesNoires();
 	}
 
 	#endregion Création
@@ -46,6 +48,19 @@ public class Grille {
 		foreach (Mot mot in listeMots) {
 			mot.AfficherMot();
 		}
+	}
+
+	/// <summary>
+	/// Compte le nombre de cases noires de la grille
+	/// </summary>
+	public int CompterCasesNoires() {
+		nbCasesNoires = 0;
+		foreach (Lettre lettre in listeLettres) {
+			if (lettre.valeur == null) {
+				nbCasesNoires++;
+			}
+		}
+		return nbCasesNoires;
 	}
 
 	#endregion Outils
@@ -164,9 +179,9 @@ public class Grille {
 	/// <param name="gridAsString"></param>
 	private void LireGridFile(string gridAsString) {
 		List<string> eachLine = new List<string>();
-		eachLine.AddRange(gridAsString.Split("\n"[0]) );
-		nbLignes = eachLine.Count - 1;
-		nbColonnes = eachLine[0].Length - 1;
+		eachLine.AddRange(gridAsString.Split((new string[] { "\r\n", "\n" }), System.StringSplitOptions.None));
+		nbLignes = eachLine.Count;
+		nbColonnes = eachLine[0].Length;
 		listeLettres = new Lettre[nbLignes, nbColonnes];
 		for (int y = 0; y < nbLignes; y++) {
 			for (int x = 0; x < nbColonnes; x++) {

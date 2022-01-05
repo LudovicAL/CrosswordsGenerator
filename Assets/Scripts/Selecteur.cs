@@ -2,15 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(LaunchManager))]
 public class Selecteur : MonoBehaviour {
 
-	bool horizontalMode;
-	Lettre lettreActuelle;
-	private LaunchManager launchManager;
+	private bool horizontalMode;
+	private Lettre lettreActuelle;
+
+	public static Selecteur Instance { get; private set; }
 
 	private void Awake() {
-		launchManager = gameObject.GetComponent<LaunchManager>();
+		if (Instance == null) {
+			Instance = this;
+		} else if (Instance != this) {
+			Destroy(gameObject);
+		}
+		//DontDestroyOnLoad(gameObject);
 	}
 
 	void Start () {
@@ -18,7 +23,7 @@ public class Selecteur : MonoBehaviour {
 	}
 	
 	void Update () {
-		if (launchManager.grille != null) {
+		if (LaunchManager.Instance.grille != null) {
 			if (Input.GetButtonDown("Horizontal")) {
 				horizontalMode = true;
 				if (Input.GetAxisRaw("Horizontal") > 0) {
@@ -40,10 +45,7 @@ public class Selecteur : MonoBehaviour {
 
 	public void Initialiser() {
 		horizontalMode = true;
-		if (launchManager == null) {
-			launchManager = gameObject.GetComponent<LaunchManager>();
-		}
-		MajLettreActuelle(launchManager.grille.listeLettres[0, 0]);
+		MajLettreActuelle(LaunchManager.Instance.grille.listeLettres[0, 0]);
 	}
 
 	private void MajLettreActuelle(Lettre nouvelleLettre) {
